@@ -17,17 +17,24 @@ endforeach()
 
 find_package(ament_cmake REQUIRED)
 
+include_directories(include)
+
 add_executable(openai_server src/openai_server.cpp)
 ament_target_dependencies(openai_server ${THIS_PACKAGE_INCLUDE_DEPENDS})
 target_link_libraries(openai_server b64 CURL::libcurl nlohmann_json
                       ${OpenCV_LIBS})
 
+add_executable(example_client src/example_client.cpp)
+ament_target_dependencies(example_client ${THIS_PACKAGE_INCLUDE_DEPENDS})
+target_link_libraries(example_client ${OpenCV_LIBS})
+
 install(
-  TARGETS openai_server
+  TARGETS example_client openai_server
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/ros2_openai_server)
 
+install(DIRECTORY include DESTINATION include/ros2_openai_server)
 install(
   DIRECTORY test_data
   DESTINATION DESTINATION

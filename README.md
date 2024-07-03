@@ -22,6 +22,10 @@ Here's an example that returns a full string.
 
 `ros2 service call /openai_string_response ai_msgs/srv/StringResponse prompt:\ "are you a pirate?"`
 
+There's an example client which sends an image of a wooden table and prompts whether it is indeed a wooden table:
+
+`ros2 run ros2_openai_server example_client`
+
 ## Citation
 
 If you use this work, please cite it like so:

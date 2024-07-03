@@ -1,77 +1,18 @@
+#include "ros2_openai_server/convert_image_to_base_64.hpp"
+
 #include "ai_msgs/srv/bool_response.hpp"
 #include "ai_msgs/srv/string_response.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/image.hpp"
 
-#include <b64/encode.h>
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <curl/curl.h>
-#include <cv_bridge/cv_bridge.h>
 #include <nlohmann/json.hpp>
-#include <opencv2/opencv.hpp>
 #include <sensor_msgs/image_encodings.hpp>
 #include <stdlib.h>
 
-// Uncomment this to use the test image
-#define HARD_CODED_IMAGE_TESTING
-
 namespace openai_server
 {
-
-namespace
-{
-/**
- * @brief Convert jpeg to base64 encoding. There are 2 possible input types.
- *
- * @param image_path path to image on disk
- * @param image_cv_mat an image
- * @return image encoded as string. If there was an error, it will be empty.
- */
-std::string convert_image_to_base_64(const std::optional<const std::string>& image_path,
-                                     const std::optional<const cv::Mat>& image_cv_mat)
-{
-  if (!image_path && !image_cv_mat)
-  {
-    std::cerr << "Both inputs to convert_image_to_base_64() are nullopt. One valid input is required." << std::endl;
-    return "";
-  }
-
-  cv::Mat image;
-  if (image_path)
-  {
-    image = cv::imread(*image_path, cv::IMREAD_COLOR);
-    if (image.empty())
-    {
-      std::cerr << "Could not read the image: " << *image_path << std::endl;
-      return "";
-    }
-  }
-  else
-  {
-    image = image_cv_mat.value();
-    if (image.empty())
-    {
-      std::cerr << "Passed image was empty" << std::endl;
-      return "";
-    }
-  }
-
-  // Encode image to JPEG format
-  std::vector<uchar> buf;
-  cv::imencode(".jpg", image, buf);
-
-  // Convert the buffer to a char array
-  std::string encoded_data(buf.begin(), buf.end());
-
-  // Encode to Base64 using libb64
-  base64::encoder E;
-  std::ostringstream os;
-  std::istringstream is(encoded_data);
-  E.encode(is, os);
-
-  return os.str();
-}
-}  // namespace
-
 class OpenAIServer : public rclcpp::Node
 {
 public:
@@ -141,38 +82,23 @@ private:
       request_data["messages"][0]["role"] = "user";
       // Attach the image, if any
       // See https://platform.openai.com/docs/guides/vision
-      if (
-#ifdef HARD_CODED_IMAGE_TESTING
-          1
-#endif
-#ifndef HARD_CODED_IMAGE_TESTING
-          0
-#endif
-      )
+      if (image.height > 0)
       {
-        std::string encoded_image = convert_image_to_base_64(
-            std::optional<const std::string>(
-                "/home/andy/ws_nav2/install/ros2_openai_server/share/ros2_openai_server/test_data/wood_table.jpg"),
-            std::nullopt);
-        request_data["messages"][0]["content"][0]["type"] = "text";
-        request_data["messages"][0]["content"][0]["text"] = prompt;
-        request_data["messages"][0]["content"][1]["type"] = "image_url";
-        request_data["messages"][0]["content"][1]["image_url"]["url"] = ("data:image/jpg;base64," + encoded_image);
-      }
-      else if (image.height > 0)
-      {
-        cv_bridge::CvImagePtr cv_ptr;
+        std::string encoded_image;
         try
         {
-          cv_ptr = cv_bridge::toCvCopy(image, image.encoding);
-          std::string encoded_image =
-              convert_image_to_base_64(std::nullopt, std::optional<const cv::Mat>(cv_ptr->image));
+          cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(image, image.encoding);
+          encoded_image = convert_image_to_base_64(std::nullopt, std::optional<const cv::Mat>(cv_ptr->image));
         }
         catch (cv_bridge::Exception& e)
         {
           RCLCPP_ERROR(this->get_logger(), "cv_bridge exception: %s", e.what());
           return false;
         }
+        request_data["messages"][0]["content"][0]["type"] = "text";
+        request_data["messages"][0]["content"][0]["text"] = prompt;
+        request_data["messages"][0]["content"][1]["type"] = "image_url";
+        request_data["messages"][0]["content"][1]["image_url"]["url"] = ("data:image/jpg;base64," + encoded_image);
       }
       else  // No image
       {
