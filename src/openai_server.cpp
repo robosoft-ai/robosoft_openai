@@ -1,7 +1,6 @@
 #include "ros2_openai_server/convert_image_to_base_64.hpp"
 
-#include "ai_msgs/srv/bool_response.hpp"
-#include "ai_msgs/srv/string_response.hpp"
+#include "ai_msgs/srv/string_image_prompt.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/image.hpp"
 
@@ -18,13 +17,8 @@ class OpenAIServer : public rclcpp::Node
 public:
   OpenAIServer() : Node("service_client")
   {
-    bool_response_srv_ = create_service<ai_msgs::srv::BoolResponse>(
-        "openai_bool_response",
-        std::bind(&OpenAIServer::boolResponseCallback, this, std::placeholders::_1, std::placeholders::_2));
-
-    string_response_srv_ = create_service<ai_msgs::srv::StringResponse>(
-        "openai_string_response",
-        std::bind(&OpenAIServer::stringResponseCallback, this, std::placeholders::_1, std::placeholders::_2));
+    prompt_srv_ = create_service<ai_msgs::srv::StringImagePrompt>(
+        "openai_server", std::bind(&OpenAIServer::promptCallback, this, std::placeholders::_1, std::placeholders::_2));
 
     curl_ = curl_easy_init();
     const std::string base_url = "https://api.openai.com/v1/chat/completions";
@@ -65,12 +59,12 @@ private:
    * @tparam T The response type may be bool or string
    * @param prompt Input prompt
    * @param image Input image
-   * @param response_filter How to filter the response from OpenAI. Search for a boolean yes/no, for example.
-   * @param response The response, which will be returned from the service
+   * @param string_response String response, which will be returned from the service
+   * @param bool_response Optional parsed yes/no response, which will be returned from the service
    * @return true if successful
    */
-  template <typename T>
-  bool sendOpenAIPrompt(const std::string& prompt, const sensor_msgs::msg::Image& image, T& response)
+  bool sendOpenAIPrompt(const std::string& prompt, const sensor_msgs::msg::Image& image, std::string& string_response,
+                        bool& bool_response)
   {
     std::string openai_response;
 
@@ -135,73 +129,39 @@ private:
 
     RCLCPP_INFO_STREAM(this->get_logger(), openai_response);
     nlohmann::json jresponse = nlohmann::json::parse(openai_response);
-    std::string string_response = jresponse["choices"][0]["message"]["content"].get<std::string>();
+    string_response = jresponse["choices"][0]["message"]["content"].get<std::string>();
 
-    if constexpr (std::is_same_v<T, std::string>)
-    {
-      // Pass the OpenAI string response forward
-      response = string_response;
-    }
-    else if constexpr (std::is_same_v<T, bool>)
-    {
-      // Parse for a one-word Yes/No reply
-      RCLCPP_INFO_STREAM(this->get_logger(), string_response);
-      if ((string_response.find("Yes") != std::string::npos) || (string_response.find("yes") != std::string::npos))
-      {
-        response = true;
-      }
-      else
-      {
-        response = false;
-      }
-    }
-    else
-    {
-      RCLCPP_ERROR_STREAM(this->get_logger(), "Unexpected type");
-      return false;
-    }
+    // Parse for a one-word Yes/No reply
+    bool_response =
+        ((string_response.find("Yes") != std::string::npos) || (string_response.find("yes") != std::string::npos));
 
     return true;
   }
 
   /**
-   * @brief Callback for a BoolResponse service type
+   * @brief Callback for a StringImagePrompt service type
    *
    * @param request service request
    * @param response bool response, parsed from OpenAI's string response
    */
-  void boolResponseCallback(const std::shared_ptr<ai_msgs::srv::BoolResponse::Request> request,
-                            std::shared_ptr<ai_msgs::srv::BoolResponse::Response> response)
+  void promptCallback(const std::shared_ptr<ai_msgs::srv::StringImagePrompt::Request> request,
+                      std::shared_ptr<ai_msgs::srv::StringImagePrompt::Response> response)
   {
-    RCLCPP_INFO_STREAM(this->get_logger(), "Incoming BoolResponse request: " << request->prompt);
-    bool bool_response;
-    bool result = sendOpenAIPrompt<bool>(request->prompt, request->image, bool_response);
-
-    RCLCPP_INFO_STREAM(this->get_logger(), "Received response: " << bool_response);
-    response->response = bool_response;
-  }
-
-  /**
-   * @brief Callback for a StringResponse service type
-   *
-   * @param request service request
-   * @param response string response
-   */
-  void stringResponseCallback(const std::shared_ptr<ai_msgs::srv::StringResponse::Request> request,
-                              std::shared_ptr<ai_msgs::srv::StringResponse::Response> response)
-  {
-    RCLCPP_INFO_STREAM(this->get_logger(), "Incoming StringResponse request: " << request->prompt);
-    // No filter on the response, just pass the string through
+    RCLCPP_INFO_STREAM(this->get_logger(), "Incoming StringImagePrompt request: " << request->prompt);
     std::string string_response;
-    bool result = sendOpenAIPrompt<std::string>(request->prompt, request->image, string_response);
+    bool bool_response;
+    bool result = sendOpenAIPrompt(request->prompt, request->image, string_response, bool_response);
+    response->is_valid = result;
 
-    RCLCPP_INFO_STREAM(this->get_logger(), "Received response: " << string_response);
-    response->response = string_response;
+    RCLCPP_INFO_STREAM(this->get_logger(), "Received boolean response: " << bool_response);
+    response->bool_response = bool_response;
+
+    RCLCPP_INFO_STREAM(this->get_logger(), "Received string response: " << string_response);
+    response->string_response = std::move(string_response);
   }
 
-  // Currently we provide servers for 2 types
-  rclcpp::Service<ai_msgs::srv::BoolResponse>::SharedPtr bool_response_srv_;
-  rclcpp::Service<ai_msgs::srv::StringResponse>::SharedPtr string_response_srv_;
+  rclcpp::Service<ai_msgs::srv::StringImagePrompt>::SharedPtr prompt_srv_;
+
   std::string openai_key_string_;
   CURL* curl_;
 };

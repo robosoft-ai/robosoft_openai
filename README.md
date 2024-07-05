@@ -28,7 +28,7 @@ Here's a quick example:
 
 Send it a prompt. Here's an example that returns a bool from a yes/no question. Not that the `image` field of the service request may be left empty.
 
-`ros2 service call /openai_bool_response ai_msgs/srv/BoolResponse prompt:\ "Are you a pirate? Please respond with a one-word answer, yes or no"`
+`ros2 service call /openai_server ai_msgs/srv/BoolResponse prompt:\ "Are you a pirate? Please respond with a one-word answer, yes or no"`
 
 Here's an example that returns a full string.
 

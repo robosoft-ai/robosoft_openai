@@ -1,4 +1,4 @@
-#include "ai_msgs/srv/bool_response.hpp"
+#include "ai_msgs/srv/string_image_prompt.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
@@ -15,10 +15,10 @@ int main(int argc, char** argv)
   rclcpp::init(argc, argv);
 
   std::shared_ptr<rclcpp::Node> node = rclcpp::Node::make_shared("open_ai_client");
-  rclcpp::Client<ai_msgs::srv::BoolResponse>::SharedPtr client =
-      node->create_client<ai_msgs::srv::BoolResponse>("openai_bool_response");
+  rclcpp::Client<ai_msgs::srv::StringImagePrompt>::SharedPtr client =
+      node->create_client<ai_msgs::srv::StringImagePrompt>("openai_server");
 
-  auto request = std::make_shared<ai_msgs::srv::BoolResponse::Request>();
+  auto request = std::make_shared<ai_msgs::srv::StringImagePrompt::Request>();
   request->prompt = "Is this a wooden table? Please respond in one word, yes or no.";
 
   // Add an image of a wooden table to the OpenAI request
@@ -41,7 +41,7 @@ int main(int argc, char** argv)
   // Wait for the result.
   if (rclcpp::spin_until_future_complete(node, result) == rclcpp::FutureReturnCode::SUCCESS)
   {
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Response: %b", result.get()->response);
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Response: %b", result.get()->bool_response);
   }
   else
   {
