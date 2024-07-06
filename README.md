@@ -22,7 +22,11 @@ Set it as an environment variable: `export OPENAI_API_KEY="..."`
 
 ### Dependencies
 
-`sudo apt install -y libcurl4-openssl-dev nlohmann-json3-dev libb64-dev`
+`sudo apt install -y libcurl4-openssl-dev`
+
+`sudo apt install -y nlohmann-json3-dev`
+
+`sudo apt install -y libb64-dev`
 
 ## Run
 
@@ -30,15 +34,15 @@ Here's a quick example:
 
 `ros2 run ros2_openai_server openai_server`
 
-Send it a prompt. Here's an example that returns a bool from a yes/no question. Not that the `image` field of the service request may be left empty.
+Send it a prompt. Here's an example that returns a bool from a yes/no question. Note that the `image` field of the service request may be left empty...
 
 `ros2 service call /openai_server ai_msgs/srv/BoolResponse prompt:\ "Are you a pirate? Please respond with a one-word answer, yes or no"`
 
-Here's an example that returns a full string.
+Here's an example that returns a full string...
 
 `ros2 service call /openai_string_response ai_msgs/srv/StringResponse prompt:\ "Are you a pirate?"`
 
-There's an example client which sends an image of a wooden table and prompts whether it is indeed a wooden table:
+Here's an example client which sends an image of a wooden table and prompts whether it is indeed a wooden table:
 
 `ros2 run ros2_openai_server example_client`
 
