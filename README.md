@@ -20,6 +20,10 @@ Requires an OpenAI key as described here: https://help.openai.com/en/articles/49
 
 Set it as an environment variable: `export OPENAI_API_KEY="..."`
 
+### Dependencies
+
+`sudo apt install -y libcurl4-openssl-dev nlohmann-json3-dev libb64-dev`
+
 ## Run
 
 Here's a quick example:
