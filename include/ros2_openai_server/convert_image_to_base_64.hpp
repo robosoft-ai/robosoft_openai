@@ -1,7 +1,7 @@
 #pragma once
 
 #include <b64/encode.h>
-#include <cv_bridge/cv_bridge.h>
+#include <cv_bridge/cv_bridge.hpp>
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <optional>

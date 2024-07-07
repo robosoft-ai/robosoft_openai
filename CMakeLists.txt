@@ -5,7 +5,8 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-set(THIS_PACKAGE_INCLUDE_DEPENDS ai_msgs cv_bridge rclcpp sensor_msgs)
+set(THIS_PACKAGE_INCLUDE_DEPENDS ai_msgs ament_index_cpp cv_bridge rclcpp
+                                 sensor_msgs)
 
 find_package(ament_cmake REQUIRED)
 find_package(CURL REQUIRED)
