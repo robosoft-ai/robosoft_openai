@@ -6,7 +6,7 @@
 #include <opencv2/opencv.hpp>
 #include <optional>
 
-namespace openai_server
+namespace robosoft_openai
 {
 /**
  * @brief Convert jpeg to base64 encoding. There are 2 possible input types.
@@ -59,4 +59,4 @@ std::string convert_image_to_base_64(const std::optional<const std::string>& ima
 
   return os.str();
 }
-}  // namespace openai_server
+}  // namespace robosoft_openai
