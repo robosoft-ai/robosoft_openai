@@ -1,4 +1,4 @@
-# ros2_openai_server
+# robosoft_openai
 
 OpenAI server node for ROS2 Applications
 
@@ -32,22 +32,22 @@ Set it as an environment variable: `export OPENAI_API_KEY="..."`
 
 Here's a quick example:
 
-`ros2 run ros2_openai_server openai_server`
+`ros2 run robosoft_openai openai_server`
 
 Send it a prompt. Here's an example that returns a bool from a yes/no question. Note that the `image` field of the service request may be left empty...
 
-`ros2 service call /openai_server ai_msgs/srv/BoolResponse prompt:\ "Are you a pirate? Please respond with a one-word answer, yes or no"`
+`ros2 service call /openai_server robosoft_ai_msgs/srv/StringImagePrompt prompt:\ "Are you a pirate? Please respond with a one-word answer, yes or no"`
 
 Here's an example that returns a full string...
 
-`ros2 service call /openai_string_response ai_msgs/srv/StringResponse prompt:\ "Are you a pirate?"`
+`ros2 service call /openai_server robosoft_ai_msgs/srv/StringImagePrompt prompt:\ "Are you a pirate?"`
 
 Here's an example client which sends an image of a wooden table and prompts whether it is indeed a wooden table:
 
-`ros2 run ros2_openai_server example_client`
+`ros2 run robosoft_openai example_client`
 
 ## Citation
 
 If you use this work, please cite it like so:
 
- - Zelenak, A., Lock, J., & Aldrich, B. (2024) *An OpenAI Server for ROS2*. Github. **https://github.com/robosoft-ai/ros2_openai_server**
+ - Zelenak, A., Lock, J., & Aldrich, B. (2024) *An OpenAI Server for ROS2*. Github. **https://github.com/robosoft-ai/robosoft_openai**

@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.8)
-project(ros2_openai_server)
+project(robosoft_openai)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-set(THIS_PACKAGE_INCLUDE_DEPENDS ai_msgs cv_bridge rclcpp sensor_msgs)
+set(THIS_PACKAGE_INCLUDE_DEPENDS cv_bridge rclcpp robosoft_ai_msgs sensor_msgs)
 
 find_package(ament_cmake REQUIRED)
 find_package(CURL REQUIRED)
@@ -32,13 +32,13 @@ install(
   TARGETS example_client openai_server
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
-  RUNTIME DESTINATION lib/ros2_openai_server)
+  RUNTIME DESTINATION lib/robosoft_openai)
 
-install(DIRECTORY include DESTINATION include/ros2_openai_server)
+install(DIRECTORY include DESTINATION include/robosoft_openai)
 install(
   DIRECTORY test_data
   DESTINATION DESTINATION
-  share/ros2_openai_server)
+  share/robosoft_openai)
 
 ament_export_dependencies(rosidl_default_runtime)
 ament_package()
