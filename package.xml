@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>ros2_openai_server</name>
+  <name>robosoft_openai</name>
   <version>0.0.0</version>
   <description>A server which sends prompts to OpenAI</description>
   <maintainer email="andyz@utexas.edu">andy</maintainer>
@@ -9,9 +9,9 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>ai_msgs</depend>
   <depend>cv_bridge</depend>
   <depend>rclcpp</depend>
+  <depend>robosoft_ai_msgs</depend>
   <depend>sensor_msgs</depend>
 
   <test_depend>ament_lint_auto</test_depend>

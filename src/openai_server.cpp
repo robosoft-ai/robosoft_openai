@@ -1,6 +1,6 @@
-#include "ros2_openai_server/convert_image_to_base_64.hpp"
+#include "robosoft_openai/convert_image_to_base_64.hpp"
 
-#include "ai_msgs/srv/string_image_prompt.hpp"
+#include "robosoft_ai_msgs/srv/string_image_prompt.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/image.hpp"
 
@@ -10,14 +10,14 @@
 #include <sensor_msgs/image_encodings.hpp>
 #include <stdlib.h>
 
-namespace openai_server
+namespace robosoft_openai
 {
 class OpenAIServer : public rclcpp::Node
 {
 public:
   OpenAIServer() : Node("service_client")
   {
-    prompt_srv_ = create_service<ai_msgs::srv::StringImagePrompt>(
+    prompt_srv_ = create_service<robosoft_ai_msgs::srv::StringImagePrompt>(
         "openai_server", std::bind(&OpenAIServer::promptCallback, this, std::placeholders::_1, std::placeholders::_2));
 
     curl_ = curl_easy_init();
@@ -144,8 +144,8 @@ private:
    * @param request service request
    * @param response bool response, parsed from OpenAI's string response
    */
-  void promptCallback(const std::shared_ptr<ai_msgs::srv::StringImagePrompt::Request> request,
-                      std::shared_ptr<ai_msgs::srv::StringImagePrompt::Response> response)
+  void promptCallback(const std::shared_ptr<robosoft_ai_msgs::srv::StringImagePrompt::Request> request,
+                      std::shared_ptr<robosoft_ai_msgs::srv::StringImagePrompt::Response> response)
   {
     RCLCPP_INFO_STREAM(this->get_logger(), "Incoming StringImagePrompt request: " << request->prompt);
     std::string string_response;
@@ -160,18 +160,18 @@ private:
     response->string_response = std::move(string_response);
   }
 
-  rclcpp::Service<ai_msgs::srv::StringImagePrompt>::SharedPtr prompt_srv_;
+  rclcpp::Service<robosoft_ai_msgs::srv::StringImagePrompt>::SharedPtr prompt_srv_;
 
   std::string openai_key_string_;
   CURL* curl_;
 };
-}  // namespace openai_server
+}  // namespace robosoft_openai
 
 int main(int argc, char* argv[])
 {
   rclcpp::init(argc, argv);
 
-  auto service_client = std::make_shared<openai_server::OpenAIServer>();
+  auto service_client = std::make_shared<robosoft_openai::OpenAIServer>();
   while (rclcpp::ok())
   {
     rclcpp::spin_some(service_client);

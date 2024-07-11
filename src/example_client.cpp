@@ -1,4 +1,4 @@
-#include "ai_msgs/srv/string_image_prompt.hpp"
+#include "robosoft_ai_msgs/srv/string_image_prompt.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
@@ -15,14 +15,14 @@ int main(int argc, char** argv)
   rclcpp::init(argc, argv);
 
   std::shared_ptr<rclcpp::Node> node = rclcpp::Node::make_shared("open_ai_client");
-  rclcpp::Client<ai_msgs::srv::StringImagePrompt>::SharedPtr client =
-      node->create_client<ai_msgs::srv::StringImagePrompt>("openai_server");
+  rclcpp::Client<robosoft_ai_msgs::srv::StringImagePrompt>::SharedPtr client =
+      node->create_client<robosoft_ai_msgs::srv::StringImagePrompt>("openai_server");
 
-  auto request = std::make_shared<ai_msgs::srv::StringImagePrompt::Request>();
+  auto request = std::make_shared<robosoft_ai_msgs::srv::StringImagePrompt::Request>();
   request->prompt = "Is this a wooden table? Please respond in one word, yes or no.";
 
   // Add an image of a wooden table to the OpenAI request
-  std::string pkg_share_directory = ament_index_cpp::get_package_share_directory("ros2_openai_server");
+  std::string pkg_share_directory = ament_index_cpp::get_package_share_directory("robosoft_openai");
   std::string image_path = pkg_share_directory + "/test_data/wood_table.jpg";
   cv::Mat img = cv::imread(image_path, cv::IMREAD_COLOR);
   sensor_msgs::msg::Image::SharedPtr msg = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", img).toImageMsg();
