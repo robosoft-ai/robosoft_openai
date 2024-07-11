@@ -1,5 +1,5 @@
 repositories:
-  robosoft_ai_msgs:
+  openai_msgs:
     type: git
-    url: https://github.com/robosoft-ai/robosoft_ai_msgs.git
+    url: https://github.com/robosoft-ai/openai_msgs.git
     version: main
