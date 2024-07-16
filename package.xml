@@ -10,7 +10,7 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>cv_bridge</depend>
-  <depend>openai_msgs</depend>
+  <depend>ai_prompt_msgs</depend>
   <depend>rclcpp</depend>
   <depend>sensor_msgs</depend>
 
