@@ -1,6 +1,6 @@
 #include "robosoft_openai/convert_image_to_base_64.hpp"
 
-#include "openai_msgs/srv/string_image_prompt.hpp"
+#include "ai_prompt_msgs/srv/string_image_prompt.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/image.hpp"
 
@@ -17,7 +17,7 @@ class OpenAIServer : public rclcpp::Node
 public:
   OpenAIServer() : Node("service_client")
   {
-    prompt_srv_ = create_service<openai_msgs::srv::StringImagePrompt>(
+    prompt_srv_ = create_service<ai_prompt_msgs::srv::StringImagePrompt>(
         "openai_server", std::bind(&OpenAIServer::promptCallback, this, std::placeholders::_1, std::placeholders::_2));
 
     curl_ = curl_easy_init();
@@ -144,8 +144,8 @@ private:
    * @param request service request
    * @param response bool response, parsed from OpenAI's string response
    */
-  void promptCallback(const std::shared_ptr<openai_msgs::srv::StringImagePrompt::Request> request,
-                      std::shared_ptr<openai_msgs::srv::StringImagePrompt::Response> response)
+  void promptCallback(const std::shared_ptr<ai_prompt_msgs::srv::StringImagePrompt::Request> request,
+                      std::shared_ptr<ai_prompt_msgs::srv::StringImagePrompt::Response> response)
   {
     RCLCPP_INFO_STREAM(this->get_logger(), "Incoming StringImagePrompt request: " << request->prompt);
     std::string string_response;
@@ -160,7 +160,7 @@ private:
     response->string_response = std::move(string_response);
   }
 
-  rclcpp::Service<openai_msgs::srv::StringImagePrompt>::SharedPtr prompt_srv_;
+  rclcpp::Service<ai_prompt_msgs::srv::StringImagePrompt>::SharedPtr prompt_srv_;
 
   std::string openai_key_string_;
   CURL* curl_;
