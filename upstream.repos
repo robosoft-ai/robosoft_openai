@@ -1,5 +1,5 @@
 repositories:
-  openai_msgs:
+  ai_prompt_msgs:
     type: git
-    url: https://github.com/robosoft-ai/openai_msgs.git
+    url: https://github.com/robosoft-ai/ai_prompt_msgs.git
     version: main
