@@ -41,7 +41,7 @@ int main(int argc, char** argv)
   // Wait for the result.
   if (rclcpp::spin_until_future_complete(node, result) == rclcpp::FutureReturnCode::SUCCESS)
   {
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Response: %b", result.get()->bool_response);
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Response: %d", result.get()->bool_response);
   }
   else
   {
